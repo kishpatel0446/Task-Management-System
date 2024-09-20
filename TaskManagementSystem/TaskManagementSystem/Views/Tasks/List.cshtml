@@ -1,0 +1,74 @@
+﻿@model List<TaskManagementSystem.Models.Entities.Work>;
+
+<h1>All Tasks</h1>
+
+<p>
+    @using (Html.BeginForm("List", "Tasks", FormMethod.Get))
+    {
+        <input type="text" name="searchTerm" placeholder="Search tasks" value="@ViewBag.SearchTerm" />
+        <input type="submit" value="Search" />
+    }
+    <br />
+    Filter by Status:
+    <br/>
+
+    @using (Html.BeginForm("List", "Tasks", FormMethod.Get))
+    {
+        <div class="d-flex">
+            @Html.DropDownList("status", new List<SelectListItem>
+        {
+        new SelectListItem { Text = "All", Value = "" },
+        new SelectListItem { Text = "Completed", Value = "Completed" },
+        new SelectListItem { Text = "Pending", Value = "Pending" }
+        }, new { @class = "form-control" })
+            <input type="submit" value="Filter" class="btn btn-primary ms-3" />
+        </div>
+    }
+    
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th hidden>Id</th>
+            <th>Title</th>
+            <th>Description</th>
+            <th>DueDate</th>
+            <th>Status</th>
+            <th> </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var Work in Model)
+        {
+            <tr>
+                <td hidden>@Work.Id</td>
+                <td>@Work.Title</td>
+                <td>@Work.Description</td>
+                <td>@Work.DueDate</td>
+                <td>@Work.Status</td>
+                <td>
+                @if (Work.Status != "Completed")
+                {
+                    <form asp-action="MarkAsCompleted" asp-route-id="@Work.Id" method="post">
+                        <button type="submit" class="btn btn-success">Mark as Completed</button>
+                    </form>
+                }
+                else
+                {
+                    <span>Already completed</span>
+                }
+                </td>
+                <td>
+                    <form asp-action="Delete" asp-controller="Tasks" asp-route-id="@Work.Id" method="post">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </td>
+                <td>
+                    <a class="btn btn-secondary" asp-controller="Tasks" asp-action="Edit" asp-route-id="@Work.Id">Edit</a>  
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
